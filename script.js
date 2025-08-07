@@ -340,3 +340,137 @@ window.addEventListener('load', () => {
         document.body.style.opacity = '1';
     }, 100);
 });
+
+// Mobile-specific enhancements
+function initMobileOptimizations() {
+    // Improve touch interactions
+    const touchElements = document.querySelectorAll('.cta-button, .contact-link, .achievement-card, .partner-logo-item');
+    touchElements.forEach(element => {
+        element.style.webkitTapHighlightColor = 'transparent';
+        element.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+        });
+        element.addEventListener('touchend', function() {
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        const navbar = document.querySelector('.navbar');
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        
+        if (window.innerWidth <= 768) {
+            if (!navbar.contains(e.target) && navMenu.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        }
+    });
+    
+    // Prevent scroll when mobile menu is open
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    hamburger.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            if (navMenu.classList.contains('active')) {
+                document.body.style.overflow = '';
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    });
+    
+    // Reset body overflow on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            document.body.style.overflow = '';
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+    });
+    
+    // Optimize parallax for mobile (reduce intensity)
+    if (window.innerWidth <= 768) {
+        window.removeEventListener('scroll', parallaxHandler);
+        window.addEventListener('scroll', mobileParallaxHandler);
+    }
+}
+
+// Separate parallax handler for mobile
+function mobileParallaxHandler() {
+    const scrolled = window.pageYOffset;
+    const heroContent = document.querySelector('.hero-content');
+    const heroVisual = document.querySelector('.hero-visual');
+    
+    if (heroContent && heroVisual && window.innerWidth <= 768) {
+        heroContent.style.transform = `translateY(${scrolled * 0.1}px)`;
+        heroVisual.style.transform = `translateY(${scrolled * 0.05}px)`;
+    }
+}
+
+// Smooth scrolling optimization for mobile
+function optimizeMobileScrolling() {
+    // Add momentum scrolling for iOS
+    document.body.style.webkitOverflowScrolling = 'touch';
+    
+    // Optimize scroll performance
+    let ticking = false;
+    
+    function updateScrolling() {
+        // Your scroll-related code here
+        ticking = false;
+    }
+    
+    function requestScrollTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateScrolling);
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', requestScrollTick);
+}
+
+// Initialize mobile optimizations when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initMobileOptimizations();
+    optimizeMobileScrolling();
+    
+    // Add viewport meta tag if it doesn't exist
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=device-width, initial-scale=1.0, user-scalable=no';
+        document.head.appendChild(viewport);
+    }
+});
+
+// Performance optimization for mobile
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Debounced scroll handler for better mobile performance
+const debouncedScrollHandler = debounce(() => {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 100) {
+        navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+    } else {
+        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+        navbar.style.boxShadow = 'none';
+    }
+}, 10);
